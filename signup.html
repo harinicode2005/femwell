@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FemWell Register</title>
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/signup.css') }}">
+</head>
+<body>
+    <div class="register-container">
+        <h2>Create Account</h2>
+        {% if error %}
+        <p style="color:red; text-align:center; margin-bottom:10px;">{{ error }}</p>
+        {% endif %}
+
+        <form action="{{ request.url_for('signup') }}" method="POST">
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" name="name" required>
+            </div>
+
+            <div class="input-group">
+                <label>Select Registration Method</label>
+                <select id="method" name="method" onchange="toggleFields()" required>
+                    <option value="">Choose Option</option>
+                    <option value="email">Email + Password</option>
+                    <option value="mobile">Mobile + OTP</option>
+                </select>
+            </div>
+
+            <div id="emailSection" style="display:none;">
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" name="email" id="email">
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" name="password" id="password">
+                </div>
+
+                <div class="input-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirm_password" id="confirm_password">
+                </div>
+            </div>
+
+            <div id="mobileSection" style="display:none;">
+                <div class="input-group">
+                    <label>Mobile Number</label>
+                    <input type="text" name="mobile" id="mobile">
+                </div>
+
+                <button type="button" onclick="sendOTP()">Send OTP</button>
+
+                <p id="otpMessage"></p>
+
+                <div class="input-group">
+                    <label>Enter OTP</label>
+                    <input type="text" name="otp" id="otp">
+                </div>
+            </div>
+
+            <button type="submit" class="register-btn">Register</button>
+        </form>
+    </div>
+
+    <div id="popup" style="display:none; position:fixed; top:20px; right:20px; background:#4CAF50; color:white; padding:15px; border-radius:5px; font-size:16px;"></div>
+
+    <script>
+    const sendOtpUrl = "{{ request.url_for('send_otp') }}";
+
+    function toggleFields() {
+        const method = document.getElementById("method").value;
+        const emailSection = document.getElementById("emailSection");
+        const mobileSection = document.getElementById("mobileSection");
+
+        emailSection.style.display = "none";
+        mobileSection.style.display = "none";
+
+        if (method === "email") {
+            emailSection.style.display = "block";
+        }
+
+        if (method === "mobile") {
+            mobileSection.style.display = "block";
+        }
+    }
+
+    function sendOTP() {
+        const mobile = document.getElementById("mobile").value;
+
+        if (!mobile) {
+            alert("Enter your mobile number first.");
+            return;
+        }
+
+        fetch(sendOtpUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "mobile=" + encodeURIComponent(mobile)
+        })
+        .then((response) => response.text())
+        .then((data) => {
+            document.getElementById("popup").innerText = data;
+            document.getElementById("popup").style.display = "block";
+            document.getElementById("otpMessage").innerText = data;
+        });
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FemWell - PCOD / PCOS Care</title>
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/index.css') }}?v=20260316">
+</head>
+<body>
+    <header>
+        <div class="logo">FemWell</div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+            <a href="{{ request.url_for('signin_page') }}" class="signin-btn">Sign In</a>
+        </nav>
+    </header>
+
+    <section class="banner"></section>
+
+    <section id="about" class="about-section">
+        <h2>About FemWell</h2>
+        <p>
+            FemWell is a health-support platform built to help women manage PCOD/PCOS
+            using symptom tracking, diet plans, exercise routines, emotional support,
+            voice assistance, and chatbot guidance.
+        </p>
+    </section>
+
+    <section class="features-section">
+        <h2>Our Features</h2>
+        <div class="features-grid">
+            <div class="feature-card feature-gated" tabindex="0" role="button">
+                <h3>Period predictor</h3>
+                <p>Predicts your next period based on last cycle.</p>
+            </div>
+            <div class="feature-card feature-gated" tabindex="0" role="button">
+                <h3>Diet Plans</h3>
+                <p>Healthy, hormone-friendly diet suggestions made for PCOD/PCOS.</p>
+            </div>
+            <div class="feature-card feature-gated" tabindex="0" role="button">
+                <h3>Exercise Planner</h3>
+                <p>Workout routines designed to help regulate hormonal imbalance.</p>
+            </div>
+            <div class="feature-card feature-gated" tabindex="0" role="button">
+                <h3>Chatbot Support</h3>
+                <p>24/7 assistance to answer your health-related doubts instantly.</p>
+            </div>
+            <div class="feature-card feature-gated" tabindex="0" role="button">
+                <h3>Voice Assistant</h3>
+                <p>Ask questions and receive guidance using your voice.</p>
+            </div>
+            <div class="feature-card feature-gated" tabindex="0" role="button">
+                <h3>Ovulation Predictor</h3>
+                <p>Accurate calculation of ovulation and fertile windows.</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="signinModal" class="modal-overlay" aria-hidden="true" hidden>
+        <div class="modal-card">
+            <button type="button" class="modal-close" data-close-modal>&times;</button>
+            <h2>Sign In</h2>
+            <p class="modal-subtitle">Sign in to unlock this feature.</p>
+            <p id="signinError" class="modal-error" aria-live="polite"></p>
+
+            <form id="signinModalForm">
+                <label for="signinLoginId">Email or Mobile Number</label>
+                <input id="signinLoginId" type="text" name="login_id" required>
+
+                <label for="signinPassword">Password</label>
+                <input id="signinPassword" type="password" name="password" placeholder="Required for email login">
+
+                <button type="submit" class="modal-btn">Continue</button>
+            </form>
+            <p class="modal-note">New here? <a href="{{ request.url_for('signup_page') }}">Create Account</a></p>
+        </div>
+    </div>
+
+    <div id="detailsModal" class="modal-overlay" aria-hidden="true" hidden>
+        <div class="modal-card">
+            <button type="button" class="modal-close" data-close-modal>&times;</button>
+            <h2>Health Setup</h2>
+            <p class="modal-subtitle">Add last period date to personalize your dashboard.</p>
+            <p id="detailsError" class="modal-error" aria-live="polite"></p>
+
+            <form id="detailsModalForm">
+                <label for="modalLastPeriodDate">Last Period Date</label>
+                <input id="modalLastPeriodDate" type="date" name="last_period_date" required>
+                <button type="submit" class="modal-btn">Save &amp; Continue</button>
+            </form>
+        </div>
+    </div>
+
+    <footer id="contact" class="footer">
+        <div class="footer-container">
+            <div class="footer-about">
+                <h3>FemWell</h3>
+                <p>
+                    Supporting women with PCOD/PCOS through cycle tracking,
+                    diet plans, exercises, and emotional wellness support.
+                </p>
+            </div>
+
+            <div class="footer-contact">
+                <h3>Contact Us</h3>
+                <p>Email: supportfemwell@gmail.com</p>
+                <p>Mobile: +91 6379792939</p>
+            </div>
+
+            <div class="footer-social">
+                <h3>Follow Us</h3>
+                <a href="https://www.instagram.com/support.femwell">Instagram</a>
+                <a href="https://wa.me/916379792939">WhatsApp</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 FemWell - All Rights Reserved</p>
+        </div>
+    </footer>
+    <script>
+        window.appRoutes = {
+            signin: "{{ request.url_for('signin') }}",
+            details: "{{ request.url_for('details') }}",
+            dashboard: "{{ request.url_for('dashboard') }}",
+        };
+    </script>
+    <script src="{{ request.url_for('static', path='javascript/index.js') }}?v=20260316-1"></script>
+</body>
+</html>

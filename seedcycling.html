@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FemWell | Seed Cycling</title>
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/seedcycling.css') }}">
+</head>
+<body>
+    <header class="page-header">
+        <h1>Seed Cycling Guide</h1>
+        <p>Personalized for your cycle</p>
+    </header>
+
+    <section class="seed-container">
+        <div id="warningBox" class="warning hidden">
+            Your cycle has crossed 45 days.
+            Please consult a doctor.
+            You may continue sunflower and sesame seeds for hormone balance.
+        </div>
+
+        <div id="phaseTitle" class="phase-title"></div>
+        <div class="seed-grid" id="seedGrid"></div>
+    </section>
+
+    <script src="{{ request.url_for('static', path='javascript/seedcycling.js') }}"></script>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>FemWell</h3>
+                <p>Your daily companion for health, wellness, and self-care.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="{{ request.url_for('home') }}">Home</a></li>
+                    <li><a href="{{ request.url_for('wellness_page') }}">Wellness Tips</a></li>
+                    <li><a href="{{ request.url_for('exercise_page') }}">Exercises</a></li>
+                    <li><a href="{{ request.url_for('contact_page') }}">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="#">Instagram</a>
+                    <a href="#">WhatsApp</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+        </div>
+
+        <p class="footer-bottom">&copy; 2025 FemWell - All Rights Reserved</p>
+    </footer>
+</body>
+</html>

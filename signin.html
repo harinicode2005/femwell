@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FemWell | Sign In</title>
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/signin.css') }}?v=20260316-1">
+</head>
+<body>
+    <div class="signin-container">
+        <div class="signin-card">
+            <h1 class="logo">FemWell</h1>
+            <h2>Sign In</h2>
+            <p class="subtitle">Welcome back to your wellness journey</p>
+
+            {% if error %}
+            <p style="color:red; text-align:center; margin-bottom:10px;">{{ error }}</p>
+            {% endif %}
+            {% if message %}
+            <p style="color:green; text-align:center; margin-bottom:10px;">{{ message }}</p>
+            {% endif %}
+
+            <form action="{{ request.url_for('signin') }}" method="POST">
+                <label>Email or Mobile Number</label>
+                <input
+                    type="text"
+                    name="login_id"
+                    placeholder="Enter Email or Mobile Number"
+                    required
+                >
+
+                <label>Password</label>
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter Password for email login"
+                >
+                <p class="forgot-text"><a href="{{ request.url_for('forgot_password_page') }}">Forgot Password?</a></p>
+
+                <button type="submit" class="signin-btn">Sign In</button>
+            </form>
+
+            <p class="bottom-text">
+                Don't have an account?
+                <a href="{{ request.url_for('signup_page') }}">Create Account</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

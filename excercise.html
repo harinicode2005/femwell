@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FemWell | Exercise &amp; Yoga</title>
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/exercise.css') }}">
+</head>
+<body>
+    <header class="page-header">
+        <h1>Exercise &amp; Yoga</h1>
+        <p>Safe, gentle movements designed for PCOD / PCOS wellness</p>
+    </header>
+
+    <section class="exercise-section">
+        <h2>Gentle Exercises</h2>
+        <div class="card-grid">
+            <button
+                type="button"
+                class="exercise-card"
+                data-image="{{ request.url_for('static', path='images/stand.jpeg') }}"
+                data-title="Brisk Walking"
+            >
+                <h3>Brisk Walking</h3>
+                <p>Improves insulin sensitivity and supports weight balance.</p>
+            </button>
+            <button
+                type="button"
+                class="exercise-card"
+                data-image="{{ request.url_for('static', path='images/bodybend.jpeg') }}"
+                data-title="Full Body Stretching"
+            >
+                <h3>Full Body Stretching</h3>
+                <p>Reduces muscle stiffness and improves blood circulation.</p>
+            </button>
+            <button
+                type="button"
+                class="exercise-card"
+                data-image="{{ request.url_for('static', path='images/cycle.jpeg') }}"
+                data-title="Light Cycling"
+            >
+                <h3>Light Cycling</h3>
+                <p>Boosts metabolism without stressing the body.</p>
+            </button>
+            <button
+                type="button"
+                class="exercise-card"
+                data-image="{{ request.url_for('static', path='images/squat.jpeg') }}"
+                data-title="Bodyweight Squats"
+            >
+                <h3>Bodyweight Squats</h3>
+                <p>Strengthens lower body and helps regulate hormones.</p>
+            </button>
+        </div>
+    </section>
+
+    <section class="exercise-section">
+        <h2>Yoga for PCOD / PCOS</h2>
+        <div class="card-grid yoga-grid">
+            <button
+                type="button"
+                class="exercise-card"
+                data-image="{{ request.url_for('static', path='images/bend.jpeg') }}"
+                data-title="Butterfly Pose (Baddha Konasana)"
+            >
+                <h3>Butterfly Pose (Baddha Konasana)</h3>
+                <p>Improves pelvic circulation and supports ovarian health.</p>
+            </button>
+            <button
+                type="button"
+                class="exercise-card"
+                data-image="{{ request.url_for('static', path='images/Meditate.jpeg') }}"
+                data-title="Child's Pose (Balasana)"
+            >
+                <h3>Child's Pose (Balasana)</h3>
+                <p>Relieves stress and calms the nervous system.</p>
+            </button>
+            <button
+                type="button"
+                class="exercise-card"
+                data-image="{{ request.url_for('static', path='images/butt bridge.jpeg') }}"
+                data-title="Bridge Pose (Setu Bandhasana)"
+            >
+                <h3>Bridge Pose (Setu Bandhasana)</h3>
+                <p>Stimulates thyroid function and improves hormonal balance.</p>
+            </button>
+            <button
+                type="button"
+                class="exercise-card"
+                data-image="{{ request.url_for('static', path='images/spine lift.jpeg') }}"
+                data-title="Cat-Cow Pose"
+            >
+                <h3>Cat-Cow Pose</h3>
+                <p>Improves spinal flexibility and reduces abdominal tension.</p>
+            </button>
+        </div>
+    </section>
+
+    <div class="image-modal" id="exerciseModal" hidden>
+        <div class="image-modal-backdrop" data-close-modal></div>
+        <div class="image-modal-content" role="dialog" aria-modal="true" aria-labelledby="exerciseModalTitle">
+            <button type="button" class="image-modal-close" id="exerciseModalClose" aria-label="Close image preview">&times;</button>
+            <h3 id="exerciseModalTitle"></h3>
+            <img id="exerciseModalImage" src="" alt="">
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>FemWell</h3>
+                <p>Your daily companion for health, wellness, and self-care.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="{{ request.url_for('home') }}">Home</a></li>
+                    <li><a href="{{ request.url_for('wellness_page') }}">Wellness Tips</a></li>
+                    <li><a href="{{ request.url_for('exercise_page') }}">Exercises</a></li>
+                    <li><a href="{{ request.url_for('contact_page') }}">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="#">Instagram</a>
+                    <a href="#">WhatsApp</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+        </div>
+
+        <p class="footer-bottom">&copy; 2025 FemWell - All Rights Reserved</p>
+    </footer>
+
+    <script>
+        const exerciseModal = document.getElementById("exerciseModal");
+        const exerciseModalTitle = document.getElementById("exerciseModalTitle");
+        const exerciseModalImage = document.getElementById("exerciseModalImage");
+        const exerciseModalClose = document.getElementById("exerciseModalClose");
+        const exerciseCards = document.querySelectorAll(".exercise-card");
+        const modalCloseTargets = document.querySelectorAll("[data-close-modal]");
+
+        function closeExerciseModal() {
+            exerciseModal.hidden = true;
+            exerciseModalImage.src = "";
+            exerciseModalImage.alt = "";
+        }
+
+        exerciseCards.forEach((card) => {
+            card.addEventListener("click", () => {
+                const imageSrc = card.dataset.image;
+                const title = card.dataset.title;
+
+                exerciseModalTitle.textContent = title;
+                exerciseModalImage.src = imageSrc;
+                exerciseModalImage.alt = title;
+                exerciseModal.hidden = false;
+            });
+        });
+
+        exerciseModalClose.addEventListener("click", closeExerciseModal);
+        modalCloseTargets.forEach((target) => target.addEventListener("click", closeExerciseModal));
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && !exerciseModal.hidden) {
+                closeExerciseModal();
+            }
+        });
+    </script>
+</body>
+</html>

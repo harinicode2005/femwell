@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FemWell | Dashboard</title>
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/dashboard.css') }}?v=20260316-2">
+</head>
+<body class="{% if show_tracker_popup %}tracker-popup-open{% endif %}">
+    <header class="dashboard-header">
+        <div class="logo">FemWell</div>
+        <div class="header-right">
+            <span class="username">Hi, {{ name }}</span>
+            <a href="{{ request.url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="status-card">
+            <p><strong>Your Current Cycle Day</strong></p>
+            {% if cycle_day is not none %}
+                {% if cycle_day <= 45 %}
+                    <h3 id="cycleDayValue" data-cycle-day="{{ cycle_day }}">Day {{ cycle_day }} / 45</h3>
+                    <small id="cycleDayHint">Follow food and lifestyle suggestions</small>
+                {% else %}
+                    <h3>Cycle &gt; 45 Days</h3>
+                    <small>Please consult a doctor</small>
+                {% endif %}
+            {% else %}
+                <p>Your period has not been logged yet.</p>
+                <small>Update your last period date below</small>
+            {% endif %}
+        </section>
+
+        <section class="status-card">
+            <h3>Update Last Period Date</h3>
+            <form action="{{ request.url_for('details') }}" method="POST" class="update-form">
+                <input type="date" name="last_period_date" required>
+                <input type="hidden" name="selected_plan" class="selected-plan-input" value="{{ default_plan }}">
+                <button type="submit">Update</button>
+            </form>
+        </section>
+
+        <section class="status-card planner-card">
+            <h3>Choose Your Diet Plan</h3>
+            <p class="planner-copy">Select a day range here. The Food Suggestions card and PDF link will update to match that exact plan.</p>
+            <div class="planner-controls">
+                <label for="dashboardDietPlan" class="planner-label">Diet plan duration</label>
+                <select id="dashboardDietPlan" class="planner-select">
+                    {% for plan_key, plan in diet_plans.items() %}
+                    <option value="{{ plan_key }}" {% if plan_key == default_plan %}selected{% endif %}>{{ plan.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <p class="planner-note" id="plannerNote"></p>
+        </section>
+
+        <section class="features-grid">
+            <a href="{{ request.url_for('food_page') }}?plan={{ default_plan }}" class="card-link" id="foodCardLink">
+                <div class="feature-card feature-food">
+                    <h3>Food Suggestions</h3>
+                    <p id="foodCardDescription">PCOD-friendly diet guidance for the selected plan.</p>
+                   
+                </div>
+            </a>
+
+            <a href="{{ request.url_for('seedcycling_page') }}" class="card-link">
+                <div class="feature-card feature-seed">
+                    <h3>Seed Cycling</h3>
+                    <p>Hormone balance support</p>
+                </div>
+            </a>
+
+            <a href="{{ request.url_for('exercise_page') }}" class="card-link">
+                <div class="feature-card feature-exercise">
+                    <h3>Exercise / Yoga</h3>
+                    <p>Gentle and effective workouts</p>
+                </div>
+            </a>
+
+            <a href="{{ request.url_for('wellness_page') }}" class="card-link" >
+                <div class="feature-card feature-wellness">
+                    <h3>Wellness Tips</h3>
+                    <p>Stress and lifestyle care</p>
+                </div>
+            </a>
+
+            
+        </section>
+
+        <section class="today-tip">
+            <h3>Today's Wellness Tip</h3>
+            <p>{{ tip }}</p>
+        </section>
+    </main>
+
+    <div class="tracker-modal{% if show_tracker_popup %} is-visible{% endif %}" id="trackerModal" {% if not show_tracker_popup %}hidden{% endif %}>
+        <div class="tracker-modal-backdrop"></div>
+        <section class="tracker-modal-panel" aria-labelledby="trackerModalTitle" aria-modal="true" role="dialog">
+            <div class="tracker-modal-header">
+                <div>
+                    <p class="tracker-kicker">PCOD Tracker Setup</p>
+                    <h2 id="trackerModalTitle">Complete your health profile</h2>
+                    <p class="tracker-intro">We will save this once after signup so your dashboard, cycle insights, and wellness guidance feel more personal.</p>
+                </div>
+            </div>
+
+            <form action="{{ request.url_for('details') }}" method="POST" class="tracker-form">
+                <input type="hidden" name="selected_plan" class="selected-plan-input" value="{{ default_plan }}">
+                <div class="tracker-grid">
+                    <div class="tracker-section-title tracker-field-wide">Basic Details</div>
+                    <div class="tracker-field">
+                        <label for="trackerName">Name</label>
+                        <input id="trackerName" type="text" value="{{ name }}" readonly>
+                    </div>
+                    <div class="tracker-field">
+                        <label for="trackerAge">Age</label>
+                        <input id="trackerAge" type="number" name="age" min="10" max="80" placeholder="Enter your age" value="{{ tracker_details.age if tracker_details else '' }}" required>
+                    </div>
+                    <div class="tracker-field">
+                        <label for="trackerHeight">Height (cm)</label>
+                        <input id="trackerHeight" type="number" name="height_cm" min="50" max="250" step="0.1" placeholder="Enter your height" value="{{ tracker_details.height_cm if tracker_details else '' }}" required>
+                    </div>
+                    <div class="tracker-field">
+                        <label for="trackerWeight">Weight (kg)</label>
+                        <input id="trackerWeight" type="number" name="weight_kg" min="20" max="250" step="0.1" placeholder="Enter your weight" value="{{ tracker_details.weight_kg if tracker_details else '' }}" required>
+                    </div>
+                    <div class="tracker-section-title tracker-field-wide">Cycle Details</div>
+                    <div class="tracker-field">
+                        <label for="trackerLastPeriod">Last Date of Period</label>
+                        <input id="trackerLastPeriod" type="date" name="last_period_date" value="{{ tracker_details.last_period_date.isoformat() if tracker_details and tracker_details.last_period_date else '' }}" required>
+                    </div>
+                    <div class="tracker-field">
+                        <label for="trackerCycleLength">Average Cycle Length (days)</label>
+                        <input id="trackerCycleLength" type="number" name="cycle_length_days" min="15" max="90" placeholder="Example: 30" value="{{ tracker_details.cycle_length_days if tracker_details else '' }}">
+                    </div>
+                    <div class="tracker-field">
+                        <label for="trackerPeriodDuration">Period Duration (days)</label>
+                        <input id="trackerPeriodDuration" type="number" name="period_duration_days" min="1" max="15" placeholder="Example: 5" value="{{ tracker_details.period_duration_days if tracker_details else '' }}">
+                    </div>
+                    <div class="tracker-field">
+                        <label for="trackerActivityLevel">Activity Level</label>
+                        <select id="trackerActivityLevel" name="activity_level">
+                            <option value="">Select activity level</option>
+                            <option value="Low" {% if tracker_details and tracker_details.activity_level == 'Low' %}selected{% endif %}>Low</option>
+                            <option value="Moderate" {% if tracker_details and tracker_details.activity_level == 'Moderate' %}selected{% endif %}>Moderate</option>
+                            <option value="High" {% if tracker_details and tracker_details.activity_level == 'High' %}selected{% endif %}>High</option>
+                        </select>
+                    </div>
+                    <div class="tracker-section-title tracker-field-wide">Health Notes</div>
+                    <div class="tracker-field tracker-field-wide">
+                        <label for="trackerHealthIssues">Health Issues</label>
+                        <textarea id="trackerHealthIssues" name="health_issues" rows="3" placeholder="PCOD, thyroid concerns, insulin resistance, acne, hair fall, or anything else relevant">{{ tracker_details.health_issues if tracker_details else '' }}</textarea>
+                    </div>
+                    <div class="tracker-field tracker-field-wide">
+                        <label for="trackerSymptoms">Common Symptoms</label>
+                        <textarea id="trackerSymptoms" name="common_symptoms" rows="3" placeholder="Irregular periods, cramps, bloating, mood swings, fatigue, cravings">{{ tracker_details.common_symptoms if tracker_details else '' }}</textarea>
+                    </div>
+                    <div class="tracker-field">
+                        <label for="trackerDiagnosis">Diagnosis Status</label>
+                        <input id="trackerDiagnosis" type="text" name="diagnosis_status" placeholder="Diagnosed, suspected, under observation" value="{{ tracker_details.diagnosis_status if tracker_details else '' }}">
+                    </div>
+                    <div class="tracker-field">
+                        <label for="trackerMedications">Medication / Supplements</label>
+                        <input id="trackerMedications" type="text" name="medications" placeholder="Metformin, inositol, iron, vitamin D" value="{{ tracker_details.medications if tracker_details else '' }}">
+                    </div>
+                </div>
+                <button type="submit" class="tracker-submit">Save Tracker Details</button>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        window.dietPlans = {{ diet_plans | tojson }};
+        window.defaultDietPlan = {{ default_plan | tojson }};
+        window.showTrackerPopup = {{ show_tracker_popup | tojson }};
+        window.appRoutes = {
+            foodBase: "{{ request.url_for('food_page') }}",
+            downloadDietPdfPattern: "{{ request.url_for('download_diet_pdf', plan_key='__PLAN_KEY__') }}",
+        };
+    </script>
+
+    <script src="{{ request.url_for('static', path='javascript/dashboard.js') }}?v=20260316-4"></script>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>FemWell</h3>
+                <p>Your daily companion for health, wellness, and self-care.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="{{ request.url_for('home') }}">Home</a></li>
+                    <li><a href="{{ request.url_for('wellness_page') }}">Wellness Tips</a></li>
+                    <li><a href="{{ request.url_for('exercise_page') }}">Exercises</a></li>
+                    <li><a href="{{ request.url_for('contact_page') }}">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="https://www.instagram.com/support.femwell/">Instagram</a>
+                    <a href="https://wa.me/916379792939">WhatsApp</a>
+                </div>
+            </div>
+        </div>
+        <p class="footer-bottom">&copy; 2025 FemWell - All Rights Reserved</p>
+    </footer>
+</body>
+</html>

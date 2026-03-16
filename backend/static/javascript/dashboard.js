@@ -33,6 +33,22 @@ const trackerFirstInput = document.getElementById("trackerAge");
 const cycleDayValue = document.getElementById("cycleDayValue");
 const cycleDayHint = document.getElementById("cycleDayHint");
 const selectedPlanInputs = document.querySelectorAll(".selected-plan-input");
+const appRoutes = window.appRoutes || {};
+
+function buildFoodPageUrl(planKey) {
+    const foodBase = appRoutes.foodBase || "/food";
+    const url = new URL(foodBase, window.location.origin);
+    url.searchParams.set("plan", planKey);
+    return `${url.pathname}${url.search}`;
+}
+
+function buildDietPdfUrl(planKey) {
+    const pattern = appRoutes.downloadDietPdfPattern;
+    if (pattern && pattern.includes("__PLAN_KEY__")) {
+        return pattern.replace("__PLAN_KEY__", encodeURIComponent(planKey));
+    }
+    return `/download-diet-pdf/${planKey}`;
+}
 
 function getPlanDuration(planKey, plan) {
     if (plan && typeof plan.duration_days === "number") {
@@ -104,7 +120,7 @@ function updateDietPlanSelection(planKey) {
     });
 
     if (foodCardLink) {
-        foodCardLink.href = `/food?plan=${planKey}`;
+        foodCardLink.href = buildFoodPageUrl(planKey);
     }
 
     if (foodCardDescription) {
@@ -116,7 +132,7 @@ function updateDietPlanSelection(planKey) {
     }
 
     if (dietPdfCardLink) {
-        dietPdfCardLink.href = `/download-diet-pdf/${planKey}`;
+        dietPdfCardLink.href = buildDietPdfUrl(planKey);
     }
 
     if (dietPdfDescription) {

@@ -4,9 +4,18 @@ const pdfLinks = document.getElementById("pdfLinks");
 const foodPlanHeading = document.getElementById("foodPlanHeading");
 const foodHeroTitle = document.getElementById("foodHeroTitle");
 const dietPlans = window.dietPlans || {};
+const appRoutes = window.appRoutes || {};
 const savedDietPlan = localStorage.getItem("selectedDietPlan");
 const requestedDietPlan = window.defaultDietPlan || "days-1-14";
 const activeDietPlan = savedDietPlan && dietPlans[savedDietPlan] ? savedDietPlan : requestedDietPlan;
+
+function buildDietPdfUrl(planKey) {
+    const pattern = appRoutes.downloadDietPdfPattern;
+    if (pattern && pattern.includes("__PLAN_KEY__")) {
+        return pattern.replace("__PLAN_KEY__", encodeURIComponent(planKey));
+    }
+    return `/download-diet-pdf/${planKey}`;
+}
 
 function renderFoods(planKey) {
     const plan = dietPlans[planKey];
@@ -42,7 +51,7 @@ function renderPdfLink(planKey) {
     }
 
     pdfLinks.innerHTML = `
-        <a class="pdf-link active-pdf" href="/download-diet-pdf/${planKey}">
+        <a class="pdf-link active-pdf" href="${buildDietPdfUrl(planKey)}">
             Download ${plan.label} PDF
         </a>
     `;

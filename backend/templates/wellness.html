@@ -9,7 +9,7 @@
 <body>
     <header class="header">
         <div class="logo">FemWell</div>
-        <a href="/dashboard" class="back-btn">Back</a>
+        <a href="{{ request.url_for('dashboard') }}" class="back-btn">Back</a>
     </header>
 
     <div class="container">
@@ -70,10 +70,10 @@
             <div class="footer-section">
                 <h4>Quick Links</h4>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/wellness">Wellness Tips</a></li>
-                    <li><a href="/excercise">Exercises</a></li>
-                    <li><a href="/contect">Contact</a></li>
+                    <li><a href="{{ request.url_for('home') }}">Home</a></li>
+                    <li><a href="{{ request.url_for('wellness_page') }}">Wellness Tips</a></li>
+                    <li><a href="{{ request.url_for('exercise_page') }}">Exercises</a></li>
+                    <li><a href="{{ request.url_for('contact_page') }}">Contact</a></li>
                 </ul>
             </div>
 

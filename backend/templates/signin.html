@@ -20,7 +20,7 @@
             <p style="color:green; text-align:center; margin-bottom:10px;">{{ message }}</p>
             {% endif %}
 
-            <form action="/signin" method="POST">
+            <form action="{{ request.url_for('signin') }}" method="POST">
                 <label>Email or Mobile Number</label>
                 <input
                     type="text"
@@ -35,14 +35,14 @@
                     name="password"
                     placeholder="Enter Password for email login"
                 >
-                <p class="forgot-text"><a href="/forgot-password">Forgot Password?</a></p>
+                <p class="forgot-text"><a href="{{ request.url_for('forgot_password_page') }}">Forgot Password?</a></p>
 
                 <button type="submit" class="signin-btn">Sign In</button>
             </form>
 
             <p class="bottom-text">
                 Don't have an account?
-                <a href="/signup">Create Account</a>
+                <a href="{{ request.url_for('signup_page') }}">Create Account</a>
             </p>
         </div>
     </div>

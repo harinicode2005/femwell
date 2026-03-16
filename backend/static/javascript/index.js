@@ -6,6 +6,7 @@ const detailsForm = document.getElementById("detailsModalForm");
 const signinError = document.getElementById("signinError");
 const detailsError = document.getElementById("detailsError");
 const closeButtons = document.querySelectorAll("[data-close-modal]");
+const appRoutes = window.appRoutes || {};
 
 function openModal(modal) {
     if (!modal) return;
@@ -67,7 +68,7 @@ if (signinForm) {
         const formData = new FormData(signinForm);
 
         try {
-            const response = await fetch("/signin", {
+            const response = await fetch(appRoutes.signin || "/signin", {
                 method: "POST",
                 body: formData,
             });
@@ -94,7 +95,7 @@ if (detailsForm) {
         const formData = new FormData(detailsForm);
 
         try {
-            const response = await fetch("/details", {
+            const response = await fetch(appRoutes.details || "/details", {
                 method: "POST",
                 body: formData,
             });
@@ -104,7 +105,7 @@ if (detailsForm) {
                 return;
             }
 
-            window.location.href = "/dashboard";
+            window.location.href = appRoutes.dashboard || "/dashboard";
         } catch (error) {
             detailsError.textContent = "Could not save health details.";
         }

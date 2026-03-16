@@ -13,7 +13,7 @@
             <a href="#">Home</a>
             <a href="#about">About</a>
             <a href="#contact">Contact</a>
-            <a href="/signin" class="signin-btn">Sign In</a>
+            <a href="{{ request.url_for('signin_page') }}" class="signin-btn">Sign In</a>
         </nav>
     </header>
 
@@ -74,7 +74,7 @@
 
                 <button type="submit" class="modal-btn">Continue</button>
             </form>
-            <p class="modal-note">New here? <a href="/signup">Create Account</a></p>
+            <p class="modal-note">New here? <a href="{{ request.url_for('signup_page') }}">Create Account</a></p>
         </div>
     </div>
 
@@ -120,6 +120,13 @@
             <p>&copy; 2025 FemWell - All Rights Reserved</p>
         </div>
     </footer>
-    <script src="{{ request.url_for('static', path='javascript/index.js') }}?v=20260316"></script>
+    <script>
+        window.appRoutes = {
+            signin: "{{ request.url_for('signin') }}",
+            details: "{{ request.url_for('details') }}",
+            dashboard: "{{ request.url_for('dashboard') }}",
+        };
+    </script>
+    <script src="{{ request.url_for('static', path='javascript/index.js') }}?v=20260316-1"></script>
 </body>
 </html>

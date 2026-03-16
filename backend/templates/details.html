@@ -16,7 +16,7 @@
             <p style="color:red; text-align:center; margin-bottom:10px;">{{ error }}</p>
             {% endif %}
 
-            <form id="periodForm" action="/details" method="POST">
+            <form id="periodForm" action="{{ request.url_for('details') }}" method="POST">
                 <label>Last Period Date</label>
                 <input type="date" name="last_period_date" required>
                 <button type="submit">Save &amp; Continue</button>

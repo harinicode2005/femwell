@@ -10,8 +10,8 @@
     <header class="header">
         <div class="logo">FemWell</div>
         <nav>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/contect" class="active">Contact</a>
+            <a href="{{ request.url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ request.url_for('contact_page') }}" class="active">Contact</a>
         </nav>
     </header>
 
@@ -36,7 +36,7 @@
             </div>
         </div>
 
-        <form class="contact-form" action="/contect" method="POST">
+        <form class="contact-form" action="{{ request.url_for('submit_contact') }}" method="POST">
             <h2>Send Us a Message</h2>
             {% if success %}
             <div class="form-alert form-alert-success">{{ success }}</div>
@@ -64,10 +64,10 @@
             <div class="footer-section">
                 <h4>Quick Links</h4>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/wellness">Wellness Tips</a></li>
-                    <li><a href="/excercise">Exercises</a></li>
-                    <li><a href="/contect">Contact</a></li>
+                    <li><a href="{{ request.url_for('home') }}">Home</a></li>
+                    <li><a href="{{ request.url_for('wellness_page') }}">Wellness Tips</a></li>
+                    <li><a href="{{ request.url_for('exercise_page') }}">Exercises</a></li>
+                    <li><a href="{{ request.url_for('contact_page') }}">Contact</a></li>
                 </ul>
             </div>
 

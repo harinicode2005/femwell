@@ -11,7 +11,7 @@
         <div class="logo">FemWell</div>
         <div class="header-right">
             <span class="username">Hi, {{ name }}</span>
-            <a href="/logout" class="logout-btn">Logout</a>
+            <a href="{{ request.url_for('logout') }}" class="logout-btn">Logout</a>
         </div>
     </header>
 
@@ -34,7 +34,7 @@
 
         <section class="status-card">
             <h3>Update Last Period Date</h3>
-            <form action="/details" method="POST" class="update-form">
+            <form action="{{ request.url_for('details') }}" method="POST" class="update-form">
                 <input type="date" name="last_period_date" required>
                 <input type="hidden" name="selected_plan" class="selected-plan-input" value="{{ default_plan }}">
                 <button type="submit">Update</button>
@@ -56,7 +56,7 @@
         </section>
 
         <section class="features-grid">
-            <a href="/food?plan={{ default_plan }}" class="card-link" id="foodCardLink">
+            <a href="{{ request.url_for('food_page') }}?plan={{ default_plan }}" class="card-link" id="foodCardLink">
                 <div class="feature-card feature-food">
                     <h3>Food Suggestions</h3>
                     <p id="foodCardDescription">PCOD-friendly diet guidance for the selected plan.</p>
@@ -64,21 +64,21 @@
                 </div>
             </a>
 
-            <a href="/seedcycling" class="card-link">
+            <a href="{{ request.url_for('seedcycling_page') }}" class="card-link">
                 <div class="feature-card feature-seed">
                     <h3>Seed Cycling</h3>
                     <p>Hormone balance support</p>
                 </div>
             </a>
 
-            <a href="/excercise" class="card-link">
+            <a href="{{ request.url_for('exercise_page') }}" class="card-link">
                 <div class="feature-card feature-exercise">
                     <h3>Exercise / Yoga</h3>
                     <p>Gentle and effective workouts</p>
                 </div>
             </a>
 
-            <a href="/wellness" class="card-link" >
+            <a href="{{ request.url_for('wellness_page') }}" class="card-link" >
                 <div class="feature-card feature-wellness">
                     <h3>Wellness Tips</h3>
                     <p>Stress and lifestyle care</p>
@@ -105,7 +105,7 @@
                 </div>
             </div>
 
-            <form action="/details" method="POST" class="tracker-form">
+            <form action="{{ request.url_for('details') }}" method="POST" class="tracker-form">
                 <input type="hidden" name="selected_plan" class="selected-plan-input" value="{{ default_plan }}">
                 <div class="tracker-grid">
                     <div class="tracker-section-title tracker-field-wide">Basic Details</div>
@@ -174,9 +174,13 @@
         window.dietPlans = {{ diet_plans | tojson }};
         window.defaultDietPlan = {{ default_plan | tojson }};
         window.showTrackerPopup = {{ show_tracker_popup | tojson }};
+        window.appRoutes = {
+            foodBase: "{{ request.url_for('food_page') }}",
+            downloadDietPdfPattern: "{{ request.url_for('download_diet_pdf', plan_key='__PLAN_KEY__') }}",
+        };
     </script>
 
-    <script src="{{ request.url_for('static', path='javascript/dashboard.js') }}?v=20260316-3"></script>
+    <script src="{{ request.url_for('static', path='javascript/dashboard.js') }}?v=20260316-4"></script>
 
     <footer class="site-footer">
         <div class="footer-container">
@@ -188,10 +192,10 @@
             <div class="footer-section">
                 <h4>Quick Links</h4>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/wellness">Wellness Tips</a></li>
-                    <li><a href="/excercise">Exercises</a></li>
-                    <li><a href="/contect">Contact</a></li>
+                    <li><a href="{{ request.url_for('home') }}">Home</a></li>
+                    <li><a href="{{ request.url_for('wellness_page') }}">Wellness Tips</a></li>
+                    <li><a href="{{ request.url_for('exercise_page') }}">Exercises</a></li>
+                    <li><a href="{{ request.url_for('contact_page') }}">Contact</a></li>
                 </ul>
             </div>
 

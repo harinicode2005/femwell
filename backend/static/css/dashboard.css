@@ -1,0 +1,449 @@
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fdf6f0;
+    color: #333;
+}
+
+body.tracker-popup-open {
+    overflow: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #ff6f91;
+    color: #fff;
+}
+
+.dashboard-header .logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.dashboard-header .logout-btn {
+    text-decoration: none;
+    background-color: #fff;
+    color: #ff6f91;
+    padding: 8px 15px;
+    border-radius: 5px;
+}
+
+.dashboard-container {
+    padding: 20px 30px;
+}
+
+.status-card {
+    background-color: #ffe6ea;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.status-card h3 {
+    margin: 10px 0;
+    font-size: 28px;
+}
+
+.update-form input[type="date"] {
+    padding: 8px;
+    font-size: 16px;
+    margin-right: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.update-form button {
+    padding: 8px 15px;
+    font-size: 16px;
+    background-color: #ff6f91;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.update-form button:hover {
+    background-color: #ff3d6e;
+}
+
+.planner-card {
+    text-align: left;
+}
+
+.planner-copy,
+.planner-note {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.planner-copy {
+    margin-bottom: 16px;
+}
+
+.planner-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.planner-label {
+    font-weight: 700;
+    color: #a33d64;
+}
+
+.planner-select {
+    width: min(320px, 100%);
+    padding: 12px 16px;
+    border: 1px solid #f4a6ba;
+    border-radius: 999px;
+    background: #fff7fa;
+    color: #8b2954;
+    font-size: 16px;
+    font-weight: 700;
+    outline: none;
+}
+
+.planner-note {
+    margin-top: 16px;
+    color: #8b2954;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    gap: 20px;
+    margin-top: 20px;
+    align-items: stretch;
+}
+
+.card-link {
+    display: block;
+    height: 100%;
+}
+
+.feature-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+    height: 240px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(22, 19, 29, 0.18), rgba(22, 19, 29, 0.6));
+    z-index: 1;
+}
+
+.feature-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+.feature-card h3,
+.feature-card p {
+    margin: 0;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.feature-card p {
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+.feature-food {
+    background: url("../images/food_suggestion.jpg") center/cover no-repeat;
+}
+
+.feature-seed {
+    background: url("../images/seed_cycling.webp") center/cover no-repeat;
+}
+
+.feature-exercise {
+    background: url("../images/exercise_yoga.jpg") center/cover no-repeat;
+}
+
+.feature-wellness {
+    background: url("../images/wellness.webp") center/cover no-repeat;
+}
+
+.feature-link {
+    display: inline-block;
+    margin-top: auto;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background-color: #ff6f91;
+    color: #fff;
+    font-weight: 700;
+}
+
+.today-tip {
+    margin-top: 30px;
+    background-color: #fff0f6;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.tracker-modal[hidden] {
+    display: none;
+}
+
+.tracker-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+.tracker-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(77, 18, 44, 0.6);
+    backdrop-filter: blur(6px);
+}
+
+.tracker-modal-panel {
+    position: relative;
+    width: min(960px, calc(100vw - 32px));
+    max-height: calc(100vh - 40px);
+    margin: 20px auto;
+    background: linear-gradient(180deg, #fffafc 0%, #fff 100%);
+    border-radius: 28px;
+    padding: 32px;
+    overflow-y: auto;
+    box-shadow: 0 18px 44px rgba(80, 26, 58, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.tracker-modal-header {
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #f5d9e4;
+}
+
+.tracker-kicker {
+    margin: 0 0 6px;
+    color: #c04e77;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+}
+
+.tracker-modal-header h2 {
+    margin: 0;
+    color: #8b2954;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.1;
+}
+
+.tracker-intro {
+    margin: 12px 0 0;
+    max-width: 680px;
+    color: #6e5560;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.tracker-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tracker-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    align-items: start;
+}
+
+.tracker-section-title {
+    margin-top: 6px;
+    padding-top: 8px;
+    color: #c04e77;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.tracker-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tracker-field label {
+    font-weight: 700;
+    color: #6f2244;
+    font-size: 14px;
+}
+
+.tracker-field input,
+.tracker-field select,
+.tracker-field textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #efcad8;
+    border-radius: 16px;
+    background: #ffffff;
+    color: #4b3440;
+    font: inherit;
+    box-sizing: border-box;
+    box-shadow: inset 0 1px 2px rgba(77, 18, 44, 0.03);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.tracker-field input[readonly] {
+    background: #fff4f8;
+    color: #8b2954;
+    font-weight: 700;
+}
+
+.tracker-field input::placeholder,
+.tracker-field textarea::placeholder {
+    color: #ad90a0;
+}
+
+.tracker-field input:focus,
+.tracker-field select:focus,
+.tracker-field textarea:focus {
+    outline: none;
+    border-color: #d96b93;
+    box-shadow: 0 0 0 4px rgba(255, 111, 145, 0.16);
+}
+
+.tracker-field textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+.tracker-field-wide {
+    grid-column: 1 / -1;
+}
+
+.tracker-submit {
+    align-self: flex-end;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #ff6f91, #d54f7e);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 22px rgba(213, 79, 126, 0.28);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tracker-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(213, 79, 126, 0.32);
+}
+
+.site-footer {
+    background-color: #ff6f91;
+    color: #fff;
+    padding: 20px 30px;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.site-footer a {
+    color: #fff;
+}
+
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.footer-section {
+    margin-bottom: 15px;
+}
+
+.footer-bottom {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+
+    .update-form input[type="date"] {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .update-form button,
+    .planner-select,
+    .tracker-submit {
+        width: 100%;
+    }
+
+    .tracker-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tracker-modal-panel {
+        width: calc(100vw - 24px);
+        margin: 12px auto;
+        padding: 20px;
+    }
+
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+    .features-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1201px) and (max-width: 1500px) {
+    .features-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}

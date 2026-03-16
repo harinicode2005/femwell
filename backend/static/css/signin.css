@@ -1,0 +1,109 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background: #f7f5ff;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.signin-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.signin-card {
+    background: #ffffff;
+    padding: 35px 30px;
+    border-radius: 14px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.logo {
+    color: #6B4EFF;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+h2 {
+    margin-top: 8px;
+    color: #333;
+}
+
+.subtitle {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+form {
+    text-align: left;
+}
+
+form label {
+    font-size: 14px;
+    color: #444;
+}
+
+form input {
+    width: 100%;
+    padding: 12px;
+    margin: 6px 0 18px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+
+form input:focus {
+    border-color: #6B4EFF;
+    outline: none;
+}
+
+.signin-btn {
+    width: 100%;
+    padding: 12px;
+    background: #6B4EFF;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.signin-btn:hover {
+    background: #5638db;
+    transform: translateY(-2px);
+}
+
+.forgot-text {
+    margin-top: -8px;
+    margin-bottom: 14px;
+    text-align: right;
+}
+
+.forgot-text a {
+    color: #6B4EFF;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.bottom-text {
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+.bottom-text a {
+    color: #6B4EFF;
+    text-decoration: none;
+    font-weight: 500;
+}

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FemWell | Contact Us</title>
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/contect.css') }}">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">FemWell</div>
+        <nav>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/contect" class="active">Contact</a>
+        </nav>
+    </header>
+
+    <section class="contact-container">
+        <div class="contact-info">
+            <h2>Contact Us</h2>
+            <p>We're here to support your wellness journey. Reach out anytime.</p>
+
+            <div class="info-box">
+                <h3>Email</h3>
+                <p>supportfemwell@gmail.com</p>
+            </div>
+
+            <div class="info-box">
+                <h3>Phone</h3>
+                <p>+91 6379792939</p>
+            </div>
+
+            <div class="info-box">
+                <h3>Address</h3>
+                <p>FemWell Centre, OMR, Chennai, India</p>
+            </div>
+        </div>
+
+        <form class="contact-form" action="/contect" method="POST">
+            <h2>Send Us a Message</h2>
+            {% if success %}
+            <div class="form-alert form-alert-success">{{ success }}</div>
+            {% endif %}
+            {% if error %}
+            <div class="form-alert form-alert-error">{{ error }}</div>
+            {% endif %}
+            <label>Your Name</label>
+            <input type="text" name="name" placeholder="Enter your name" value="{{ form_data.name if form_data else '' }}" required>
+            <label>Your Email</label>
+            <input type="email" name="email" placeholder="Enter your email" value="{{ form_data.email if form_data else '' }}" required>
+            <label>Your Message</label>
+            <textarea name="message" placeholder="Write your message..." required>{{ form_data.message if form_data else '' }}</textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>FemWell</h3>
+                <p>Your daily companion for health, wellness, and self-care.</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/wellness">Wellness Tips</a></li>
+                    <li><a href="/excercise">Exercises</a></li>
+                    <li><a href="/contect">Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="#">Instagram</a>
+                    <a href="#">WhatsApp</a>
+                    <a href="#">YouTube</a>
+                </div>
+            </div>
+        </div>
+
+        <p class="footer-bottom">&copy; 2025 FemWell - All Rights Reserved</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FemWell | Health Details</title>
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/details.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>FemWell</h1>
+            <h2>Health Setup</h2>
+
+            {% if error %}
+            <p style="color:red; text-align:center; margin-bottom:10px;">{{ error }}</p>
+            {% endif %}
+
+            <form id="periodForm" action="/details" method="POST">
+                <label>Last Period Date</label>
+                <input type="date" name="last_period_date" required>
+                <button type="submit">Save &amp; Continue</button>
+            </form>
+        </div>
+    </div>
+    <script src="{{ request.url_for('static', path='javascript/details.js') }}"></script>
+</body>
+</html>

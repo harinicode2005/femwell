@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FemWell | Admin Login</title>
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/admin.css') }}?v=20260409-1">
+</head>
+<body class="admin-auth-body">
+    <main class="admin-auth-shell">
+        <section class="admin-auth-card">
+            <p class="admin-kicker">FemWell Admin</p>
+            <h1>Monitor dashboard </h1>
+            <p class="admin-auth-copy"></p>
+
+            {% if error %}
+            <p class="admin-error">{{ error }}</p>
+            {% endif %}
+
+            <form action="{{ request.url_for('admin_login') }}" method="POST" class="admin-auth-form">
+                <label for="adminUsername">Username</label>
+                <input id="adminUsername" type="text" name="username" placeholder="Enter admin username" required>
+
+                <label for="adminPassword">Password</label>
+                <input id="adminPassword" type="password" name="password" placeholder="Enter admin password" required>
+
+                <button type="submit">Open Admin Dashboard</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

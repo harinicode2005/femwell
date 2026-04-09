@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FemWell | User Details</title>
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/admin.css') }}?v=20260409-2">
+</head>
+<body class="admin-dashboard-body">
+    <header class="admin-header">
+        <div>
+            <p class="admin-kicker">FemWell Admin</p>
+            <h1>User Details</h1>
+        </div>
+        <div class="admin-header-actions">
+            <a href="{{ request.url_for('admin_dashboard') }}" class="admin-secondary-link">Back to Dashboard</a>
+            <a href="{{ request.url_for('admin_logout') }}" class="admin-logout">Logout</a>
+        </div>
+    </header>
+
+    <main class="admin-shell">
+        <section class="admin-profile-hero">
+            <div>
+                <p class="admin-kicker">Profile</p>
+                <h2>{{ user_record.name or ('User #' ~ user_record.id) }}</h2>
+                <p class="admin-profile-contact">{{ user_record.email or user_record.mobile or 'No contact recorded' }}</p>
+            </div>
+            <div class="admin-visit-pill">
+                <span>Total Dashboard Visits</span>
+                <strong>{{ user_record.dashboard_visit_count }}</strong>
+            </div>
+        </section>
+
+        <section class="admin-detail-grid">
+            <article class="admin-detail-card">
+                <h3>Access Summary</h3>
+                <dl class="admin-detail-list">
+                    <div><dt>First Dashboard Access</dt><dd>{{ user_record.first_dashboard_access_at or 'Not yet accessed' }}</dd></div>
+                    <div><dt>Last Dashboard Access</dt><dd>{{ user_record.last_dashboard_access_at or 'Not yet accessed' }}</dd></div>
+                    <div><dt>Selected Plan</dt><dd>{{ user_record.target_plan_key or 'Not set' }}</dd></div>
+                    <div><dt>Target Duration</dt><dd>{{ user_record.target_duration_days or 'Not set' }}</dd></div>
+                </dl>
+            </article>
+
+            <article class="admin-detail-card">
+                <h3>Basic Health Details</h3>
+                <dl class="admin-detail-list">
+                    <div><dt>Age</dt><dd>{{ user_record.age or 'Not set' }}</dd></div>
+                    <div><dt>Height (cm)</dt><dd>{{ user_record.height_cm or 'Not set' }}</dd></div>
+                    <div><dt>Weight (kg)</dt><dd>{{ user_record.weight_kg or 'Not set' }}</dd></div>
+                    <div><dt>Activity Level</dt><dd>{{ user_record.activity_level or 'Not set' }}</dd></div>
+                </dl>
+            </article>
+
+            <article class="admin-detail-card">
+                <h3>Cycle Details</h3>
+                <dl class="admin-detail-list">
+                    <div><dt>Last Period Date</dt><dd>{{ user_record.last_period_date or 'Not set' }}</dd></div>
+                    <div><dt>Cycle Length</dt><dd>{{ user_record.cycle_length_days or 'Not set' }}</dd></div>
+                    <div><dt>Period Duration</dt><dd>{{ user_record.period_duration_days or 'Not set' }}</dd></div>
+                    <div><dt>Plan Start Date</dt><dd>{{ user_record.target_start_date or 'Not set' }}</dd></div>
+                </dl>
+            </article>
+
+            <article class="admin-detail-card admin-detail-card-wide">
+                <h3>Health Notes</h3>
+                <dl class="admin-detail-list">
+                    <div><dt>Health Issues</dt><dd>{{ user_record.health_issues or 'Not provided' }}</dd></div>
+                    <div><dt>Common Symptoms</dt><dd>{{ user_record.common_symptoms or 'Not provided' }}</dd></div>
+                    <div><dt>Diagnosis Status</dt><dd>{{ user_record.diagnosis_status or 'Not provided' }}</dd></div>
+                    <div><dt>Medications / Supplements</dt><dd>{{ user_record.medications or 'Not provided' }}</dd></div>
+                    <div><dt>Profile Created</dt><dd>{{ user_record.details_created_at or 'Not available' }}</dd></div>
+                    <div><dt>Profile Updated</dt><dd>{{ user_record.details_updated_at or 'Not available' }}</dd></div>
+                </dl>
+            </article>
+        </section>
+    </main>
+</body>
+</html>

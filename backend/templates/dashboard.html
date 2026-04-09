@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FemWell | Dashboard</title>
-    <link rel="stylesheet" href="{{ request.url_for('static', path='css/dashboard.css') }}?v=20260316-2">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/dashboard.css') }}?v=20260409-float-2">
 </head>
 <body class="{% if show_tracker_popup %}tracker-popup-open{% endif %}">
     <header class="dashboard-header">
@@ -92,7 +92,55 @@
             <h3>Today's Wellness Tip</h3>
             <p>{{ tip }}</p>
         </section>
+
     </main>
+
+    <div class="assistant-fab-wrap">
+        <button
+            type="button"
+            id="assistantToggleButton"
+            class="assistant-fab"
+            aria-expanded="false"
+            aria-controls="assistantPanel"
+        >
+            Assistant
+        </button>
+
+        <section id="assistantPanel" class="assistant-panel assistant-panel-hidden" aria-labelledby="assistantTitle">
+            <div class="assistant-header">
+                <div>
+                    <p class="assistant-kicker">FemWell Assistant</p>
+                    <h3 id="assistantTitle">Chat and voice support</h3>
+                    <p class="assistant-copy">Ask about your cycle, saved profile, diet plan, symptoms, exercise, or daily wellness guidance.</p>
+                </div>
+                <div class="assistant-actions">
+                    <button type="button" id="voiceAssistButton" class="assistant-voice-btn">Start Voice</button>
+                </div>
+            </div>
+
+            <div id="assistantStatus" class="assistant-status" aria-live="polite">
+                Voice assistant ready. You can type or use the microphone.
+            </div>
+
+            <div id="assistantMessages" class="assistant-messages" aria-live="polite">
+                <div class="assistant-message assistant-message-bot">
+                    Hello {{ name }}. I can help with your cycle day, diet plan, wellness tips, symptoms, and profile details.
+                </div>
+            </div>
+
+            <form id="assistantForm" class="assistant-form">
+                <input
+                    id="assistantInput"
+                    type="text"
+                    name="message"
+                    placeholder="Ask something like: what is my cycle day?"
+                    autocomplete="off"
+                    required
+                >
+                <button type="submit" class="assistant-send-btn">Send</button>
+            </form>
+        </section>
+    </div>
 
     <div class="tracker-modal{% if show_tracker_popup %} is-visible{% endif %}" id="trackerModal" {% if not show_tracker_popup %}hidden{% endif %}>
         <div class="tracker-modal-backdrop"></div>
@@ -177,10 +225,11 @@
         window.appRoutes = {
             foodBase: "{{ request.url_for('food_page') }}",
             downloadDietPdfPattern: "{{ request.url_for('download_diet_pdf', plan_key='__PLAN_KEY__') }}",
+            assistantQuery: "{{ request.url_for('assistant_query') }}",
         };
     </script>
 
-    <script src="{{ request.url_for('static', path='javascript/dashboard.js') }}?v=20260316-4"></script>
+    <script src="{{ request.url_for('static', path='javascript/dashboard.js') }}?v=20260409-float-1"></script>
 
     <footer class="site-footer">
         <div class="footer-container">

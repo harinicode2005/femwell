@@ -9,7 +9,7 @@ from typing import Any
 
 import mysql.connector
 from fastapi import FastAPI, Form, Request
-from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from reportlab.lib import colors
@@ -21,9 +21,23 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 
 BASE_DIR = Path(__file__).resolve().parent
-TEMPLATES_DIR = BASE_DIR / "templates"
-STATIC_DIR = BASE_DIR / "static"
 PROJECT_DIR = BASE_DIR.parent
+
+
+def resolve_asset_dir(local_name: str) -> Path:
+    local_dir = BASE_DIR / local_name
+    if local_dir.exists():
+        return local_dir
+
+    backend_dir = BASE_DIR / "backend" / local_name
+    if backend_dir.exists():
+        return backend_dir
+
+    return local_dir
+
+
+TEMPLATES_DIR = resolve_asset_dir("templates")
+STATIC_DIR = resolve_asset_dir("static")
 
 app = FastAPI(title="FemWell")
 app.add_middleware(
@@ -85,6 +99,7 @@ DIET_PLANS = {
 
 @app.on_event("startup")
 async def startup_event() -> None:
+    ensure_users_tracking_schema()
     ensure_user_details_schema()
 
 
@@ -103,6 +118,17 @@ def fetch_one(query: str, params: tuple[Any, ...] = ()) -> dict[str, Any] | None
     try:
         cursor.execute(query, params)
         return cursor.fetchone()
+    finally:
+        cursor.close()
+        db.close()
+
+
+def fetch_all(query: str, params: tuple[Any, ...] = ()) -> list[dict[str, Any]]:
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute(query, params)
+        return cursor.fetchall()
     finally:
         cursor.close()
         db.close()
@@ -194,6 +220,37 @@ def ensure_user_details_schema() -> None:
             (database_name,),
         )
         existing_columns = {row[0] for row in cursor.fetchall()}
+
+        for column_name, ddl in required_columns.items():
+            if column_name not in existing_columns:
+                cursor.execute(ddl)
+
+        db.commit()
+    finally:
+        cursor.close()
+        db.close()
+
+
+def ensure_users_tracking_schema() -> None:
+    database_name = os.getenv("DB_NAME", "femwell")
+    db = get_db_connection()
+    cursor = db.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT COLUMN_NAME
+            FROM information_schema.columns
+            WHERE table_schema=%s AND table_name='users'
+            """,
+            (database_name,),
+        )
+        existing_columns = {row[0] for row in cursor.fetchall()}
+
+        required_columns = {
+            "dashboard_visit_count": "ALTER TABLE users ADD COLUMN dashboard_visit_count INT NOT NULL DEFAULT 0",
+            "first_dashboard_access_at": "ALTER TABLE users ADD COLUMN first_dashboard_access_at DATETIME NULL",
+            "last_dashboard_access_at": "ALTER TABLE users ADD COLUMN last_dashboard_access_at DATETIME NULL",
+        }
 
         for column_name, ddl in required_columns.items():
             if column_name not in existing_columns:
@@ -339,10 +396,111 @@ def get_current_user(request: Request) -> dict[str, Any] | None:
     )
 
 
+def get_admin_credentials() -> tuple[str, str]:
+    return (
+        os.getenv("ADMIN_USERNAME", "admin"),
+        os.getenv("ADMIN_PASSWORD", "admin123"),
+    )
+
+
+def is_admin_authenticated(request: Request) -> bool:
+    return bool(request.session.get("is_admin"))
+
+
+def record_dashboard_access(user_id: int) -> None:
+    execute_query(
+        """
+        UPDATE users
+        SET
+            dashboard_visit_count = COALESCE(dashboard_visit_count, 0) + 1,
+            first_dashboard_access_at = COALESCE(first_dashboard_access_at, NOW()),
+            last_dashboard_access_at = NOW()
+        WHERE id = %s
+        """,
+        (user_id,),
+    )
+
+
 def calculate_cycle_day(last_period_date: date | None) -> int | None:
     if last_period_date is None:
         return None
     return max((date.today() - last_period_date).days, 0)
+
+
+def build_assistant_reply(user: dict[str, Any], user_details: dict[str, Any] | None, message: str) -> str:
+    text = message.strip().lower()
+    if not text:
+        return "Ask me about your cycle day, diet plan, exercise ideas, wellness tips, or the health details you saved in FemWell."
+
+    user_name = user.get("name") or "there"
+    cycle_day = None
+    if user_details and user_details.get("last_period_date"):
+        cycle_day = calculate_cycle_day(user_details["last_period_date"])
+
+    if any(word in text for word in ("hello", "hi", "hey")):
+        return f"Hello {user_name}. I can help with your cycle tracking, saved health profile, food plans, exercise guidance, and wellness tips."
+
+    if "cycle" in text or "period day" in text:
+        if cycle_day is None:
+            return "I do not see a saved last period date yet. Update it on your dashboard and I can help track your current cycle day."
+        return f"Based on your saved last period date, you are currently around cycle day {cycle_day}. If your cycle feels unusually long or irregular, consider checking with a doctor."
+
+    if "last period" in text:
+        if not user_details or not user_details.get("last_period_date"):
+            return "Your last period date is not saved yet."
+        return f"Your saved last period date is {user_details['last_period_date']}."
+
+    if "diet" in text or "food" in text or "meal" in text:
+        plan_key = user_details.get("target_plan_key") if user_details else None
+        if plan_key in DIET_PLANS:
+            plan = DIET_PLANS[plan_key]
+            foods = ", ".join(item["name"] for item in plan["items"][:3])
+            return f"Your current diet plan is {plan['label']}. A few options from it are {foods}. You can also open the Food Suggestions card for the full plan."
+        return "A good PCOD-friendly starting point is balanced protein, high-fiber meals, low GI carbs, and regular hydration. You can choose a diet plan on the dashboard for more specific guidance."
+
+    if "exercise" in text or "workout" in text or "yoga" in text:
+        return "Gentle movement works well for many users with PCOD or PCOS. Try walking, stretching, yoga, and moderate consistency instead of very intense swings. You can open the Exercise or Yoga section from the dashboard for guided options."
+
+    if "tip" in text or "wellness" in text or "stress" in text:
+        return random.choice(WELLNESS_TIPS)
+
+    if "symptom" in text or "health issue" in text or "problem" in text:
+        if not user_details:
+            return "I do not see a saved health profile yet. Complete the tracker on your dashboard and I can use it for more personalized answers."
+        symptoms = user_details.get("common_symptoms")
+        health_issues = user_details.get("health_issues")
+        if symptoms or health_issues:
+            symptom_text = symptoms or "No common symptoms saved"
+            issue_text = health_issues or "No health issues saved"
+            return f"From your profile, common symptoms: {symptom_text}. Health issues noted: {issue_text}. If any symptom becomes severe or persistent, please consult a clinician."
+        return "You have not saved symptoms or health issues yet in your profile."
+
+    if "medication" in text or "supplement" in text:
+        medications = user_details.get("medications") if user_details else None
+        if medications:
+            return f"You saved these medications or supplements: {medications}. For dose or safety questions, please follow your clinician's advice."
+        return "You have not saved any medications or supplements in your profile."
+
+    if "height" in text or "weight" in text or "age" in text or "activity" in text:
+        if not user_details:
+            return "I do not see saved profile details yet."
+        parts = []
+        if user_details.get("age") is not None:
+            parts.append(f"age {user_details['age']}")
+        if user_details.get("height_cm") is not None:
+            parts.append(f"height {user_details['height_cm']} centimeters")
+        if user_details.get("weight_kg") is not None:
+            parts.append(f"weight {user_details['weight_kg']} kilograms")
+        if user_details.get("activity_level"):
+            parts.append(f"activity level {user_details['activity_level']}")
+        if parts:
+            return f"Your saved profile shows {', '.join(parts)}."
+        return "Your basic profile details are not filled in yet."
+
+    if "help" in text or "what can you do" in text:
+        return "You can ask me things like: what is my cycle day, what diet plan am I on, suggest a wellness tip, what symptoms have I saved, or recommend gentle exercise."
+
+    return "I can help with your FemWell profile, cycle tracking, food plan, exercise, and wellness guidance. Try asking: what is my cycle day, show my saved symptoms, or give me a wellness tip."
 
 
 def get_plan_duration(plan_key: str) -> int:
@@ -709,6 +867,145 @@ async def logout(request: Request) -> RedirectResponse:
     return redirect("/")
 
 
+@app.get("/admin/login", response_class=HTMLResponse)
+async def admin_login_page(request: Request) -> HTMLResponse:
+    if is_admin_authenticated(request):
+        return redirect("/admin/dashboard")
+    return render(request, "admin_login.html", error=None)
+
+
+@app.post("/admin/login", response_class=HTMLResponse)
+async def admin_login(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...),
+) -> Response:
+    admin_username, admin_password = get_admin_credentials()
+    if username.strip() != admin_username or password != admin_password:
+        return render(request, "admin_login.html", error="Invalid admin credentials.")
+
+    request.session["is_admin"] = True
+    return redirect("/admin/dashboard")
+
+
+@app.get("/admin/logout")
+async def admin_logout(request: Request) -> RedirectResponse:
+    request.session.pop("is_admin", None)
+    return redirect("/admin/login")
+
+
+@app.get("/admin/dashboard", response_class=HTMLResponse)
+async def admin_dashboard(request: Request) -> Response:
+    if not is_admin_authenticated(request):
+        return redirect("/admin/login")
+
+    search_query = request.query_params.get("q", "").strip()
+
+    stats = fetch_one(
+        """
+        SELECT
+            COUNT(*) AS total_users,
+            COALESCE(SUM(CASE WHEN COALESCE(dashboard_visit_count, 0) > 0 THEN 1 ELSE 0 END), 0) AS dashboard_users,
+            COALESCE(SUM(COALESCE(dashboard_visit_count, 0)), 0) AS total_dashboard_visits
+        FROM users
+        """
+    ) or {"total_users": 0, "dashboard_users": 0, "total_dashboard_visits": 0}
+
+    recent_users_query = """
+        SELECT
+            id,
+            name,
+            email,
+            mobile,
+            COALESCE(dashboard_visit_count, 0) AS dashboard_visit_count,
+            first_dashboard_access_at,
+            last_dashboard_access_at
+        FROM users
+    """
+    recent_users_params: tuple[Any, ...] = ()
+    if search_query:
+        like_value = f"%{search_query}%"
+        recent_users_query += """
+        WHERE
+            name LIKE %s OR
+            email LIKE %s OR
+            mobile LIKE %s
+        """
+        recent_users_params = (like_value, like_value, like_value)
+
+    recent_users_query += """
+        ORDER BY
+            last_dashboard_access_at IS NULL,
+            last_dashboard_access_at DESC,
+            id DESC
+        LIMIT 50
+    """
+    recent_users = fetch_all(recent_users_query, recent_users_params)
+
+    total_users = int(stats["total_users"] or 0)
+    dashboard_users = int(stats["dashboard_users"] or 0)
+    total_dashboard_visits = int(stats["total_dashboard_visits"] or 0)
+    adoption_rate = round((dashboard_users / total_users) * 100, 1) if total_users else 0.0
+
+    return render(
+        request,
+        "admin_dashboard.html",
+        total_users=total_users,
+        dashboard_users=dashboard_users,
+        total_dashboard_visits=total_dashboard_visits,
+        adoption_rate=adoption_rate,
+        recent_users=recent_users,
+        search_query=search_query,
+    )
+
+
+@app.get("/admin/users/{user_id}", response_class=HTMLResponse)
+async def admin_user_details(request: Request, user_id: int) -> Response:
+    if not is_admin_authenticated(request):
+        return redirect("/admin/login")
+
+    user_record = fetch_one(
+        """
+        SELECT
+            u.id,
+            u.name,
+            u.email,
+            u.mobile,
+            COALESCE(u.dashboard_visit_count, 0) AS dashboard_visit_count,
+            u.first_dashboard_access_at,
+            u.last_dashboard_access_at,
+            d.age,
+            d.height_cm,
+            d.weight_kg,
+            d.last_period_date,
+            d.target_plan_key,
+            d.target_duration_days,
+            d.target_start_date,
+            d.cycle_length_days,
+            d.period_duration_days,
+            d.health_issues,
+            d.common_symptoms,
+            d.diagnosis_status,
+            d.medications,
+            d.activity_level,
+            d.created_at AS details_created_at,
+            d.updated_at AS details_updated_at
+        FROM users u
+        LEFT JOIN user_details d ON d.user_id = u.id
+        WHERE u.id = %s
+        """,
+        (user_id,),
+    )
+    if not user_record:
+        return redirect("/admin/dashboard")
+
+    return render(
+        request,
+        "admin_user_details.html",
+        user_record=user_record,
+    )
+
+
 @app.get("/details", response_class=HTMLResponse)
 async def details_page(request: Request) -> Response:
     if not get_current_user(request):
@@ -845,6 +1142,8 @@ async def dashboard(request: Request) -> Response:
     if not user:
         return redirect("/signin")
 
+    record_dashboard_access(user["id"])
+
     user_details = fetch_one(
         "SELECT * FROM user_details WHERE user_id=%s",
         (user["id"],),
@@ -873,6 +1172,20 @@ async def dashboard(request: Request) -> Response:
         tracker_details=user_details,
         show_tracker_popup=show_tracker_popup,
     )
+
+
+@app.post("/assistant/query")
+async def assistant_query(request: Request, message: str = Form(...)) -> Response:
+    user = get_current_user(request)
+    if not user:
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+
+    user_details = fetch_one(
+        "SELECT * FROM user_details WHERE user_id=%s",
+        (user["id"],),
+    )
+    reply = build_assistant_reply(user, user_details, message)
+    return JSONResponse({"reply": reply})
 
 
 @app.get("/download-pdf")

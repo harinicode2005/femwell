@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FemWell | Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ request.url_for('static', path='css/admin.css') }}?v=20260409-1">
+</head>
+<body class="admin-dashboard-body">
+    <header class="admin-header">
+        <div>
+            <p class="admin-kicker">FemWell Admin</p>
+            <h1>Dashboard Access Monitor</h1>
+        </div>
+        <a href="{{ request.url_for('admin_logout') }}" class="admin-logout">Logout</a>
+    </header>
+
+    <main class="admin-shell">
+        <section class="admin-stats-grid">
+            <article class="admin-stat-card">
+                <p>Total Registered Users</p>
+                <h2>{{ total_users }}</h2>
+            </article>
+            <article class="admin-stat-card">
+                <p>Users Who Reached Dashboard</p>
+                <h2>{{ dashboard_users }}</h2>
+            </article>
+            <article class="admin-stat-card">
+                <p>Total Dashboard Visits</p>
+                <h2>{{ total_dashboard_visits }}</h2>
+            </article>
+            <article class="admin-stat-card">
+                <p>Dashboard Adoption Rate</p>
+                <h2>{{ adoption_rate }}%</h2>
+            </article>
+        </section>
+
+        <section class="admin-table-card">
+            <div class="admin-table-header">
+                <div>
+                    <p class="admin-kicker">Recent Activity</p>
+                    <h2>User dashboard access details</h2>
+                </div>
+                <form action="{{ request.url_for('admin_dashboard') }}" method="GET" class="admin-search-form">
+                    <input
+                        type="search"
+                        name="q"
+                        value="{{ search_query }}"
+                        placeholder="Search by name, email, or mobile"
+                    >
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Contact</th>
+                            <th>Visits</th>
+                            <th>First Dashboard Access</th>
+                            <th>Last Dashboard Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in recent_users %}
+                        <tr>
+                            <td>
+                                <a href="{{ request.url_for('admin_user_details', user_id=user.id) }}" class="admin-user-link">
+                                    {{ user.name or ('User #' ~ user.id) }}
+                                </a>
+                            </td>
+                            <td>{{ user.email or user.mobile or 'Not available' }}</td>
+                            <td>{{ user.dashboard_visit_count }}</td>
+                            <td>{{ user.first_dashboard_access_at or 'Not yet accessed' }}</td>
+                            <td>{{ user.last_dashboard_access_at or 'Not yet accessed' }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if not recent_users %}
+                        <tr>
+                            <td colspan="5" class="admin-empty-state">No users matched your search.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
